@@ -1,0 +1,78 @@
+import java.util.Scanner;
+
+public class SRTF {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        
+        System.out.print("Enter number of processes: ");
+        int n = sc.nextInt();
+        
+        int[] arrivalTime = new int[n];
+        int[] burstTime = new int[n];
+        int[] remainingTime = new int[n];
+        int[] completionTime = new int[n];
+        int[] waitingTime = new int[n];
+        int[] turnAroundTime = new int[n];
+        
+        // Input arrival and burst times
+        for (int i = 0; i < n; i++) {
+            System.out.print("Enter arrival time of process " + (i + 1) + ": ");
+            arrivalTime[i] = sc.nextInt();
+            System.out.print("Enter burst time of process " + (i + 1) + ": ");
+            burstTime[i] = sc.nextInt();
+            remainingTime[i] = burstTime[i];
+        }
+
+        int completed = 0, time = 0, minTime = Integer.MAX_VALUE;
+        int shortest = 0, finishTime;
+        boolean check = false;
+        
+        // Process until all processes are completed
+        while (completed != n) {
+            for (int i = 0; i < n; i++) {
+                if ((arrivalTime[i] <= time) && (remainingTime[i] < minTime) && remainingTime[i] > 0) {
+                    minTime = remainingTime[i];
+                    shortest = i;
+                    check = true;
+                }
+            }
+
+            if (!check) {
+                time++;
+                continue;
+            }
+
+            // Reduce remaining time
+            remainingTime[shortest]--;
+            minTime = remainingTime[shortest];
+            if (minTime == 0) minTime = Integer.MAX_VALUE;
+
+            // If a process gets completely executed
+            if (remainingTime[shortest] == 0) {
+                completed++;
+                check = false;
+
+                finishTime = time + 1;
+                completionTime[shortest] = finishTime;
+                waitingTime[shortest] = finishTime - burstTime[shortest] - arrivalTime[shortest];
+                
+                if (waitingTime[shortest] < 0) waitingTime[shortest] = 0;
+            }
+            
+            time++;
+        }
+
+        // Calculate turn-around time
+        for (int i = 0; i < n; i++) {
+            turnAroundTime[i] = burstTime[i] + waitingTime[i];
+        }
+
+        // Print results
+        System.out.println("\nProcess\tArrival\tBurst\tCompletion\tWaiting\tTurn-Around");
+        for (int i = 0; i < n; i++) {
+            System.out.println((i+1) + "\t" + arrivalTime[i] + "\t" + burstTime[i] + "\t" + completionTime[i] + "\t\t" + waitingTime[i] + "\t" + turnAroundTime[i]);
+        }
+        
+        sc.close();
+    }
+}
