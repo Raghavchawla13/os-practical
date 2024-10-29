@@ -1,0 +1,50 @@
+1. Fibonacci Series
+
+#!/bin/bash
+echo "Enter number of terms:"
+read n
+a=0
+b=1
+echo "Fibonacci Series:"
+for (( i=0; i<n; i++ ))
+do
+    echo -n "$a "
+    fn=$((a + b))
+    a=$b
+    b=$fn
+done
+echo
+
+
+2. Largest of Three Numbers
+
+#!/bin/bash
+echo "Enter three numbers:"
+read a
+read b
+read c
+if [ $a -ge $b ] && [ $a -ge $c ]
+then
+    largest=$a
+elif [ $b -ge $a ] && [ $b -ge $c ]
+then
+    largest=$b
+else
+    largest=$c
+fi
+echo "The largest number is: $largest"
+
+
+3. Average of N Numbers
+
+#!/bin/bash
+echo "Enter numbers separated by space:"
+read -a numbers
+sum=0
+count=${#numbers[@]}
+for num in "${numbers[@]}"
+do
+    sum=$((sum + num))
+done
+average=$(echo "$sum / $count" | bc -l)
+echo "Average: $average"

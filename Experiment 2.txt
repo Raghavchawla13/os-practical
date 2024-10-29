@@ -1,0 +1,53 @@
+1. Hello World Shell Program
+
+
+#!/bin/bash
+echo "Hello, World!"
+
+
+2. Factorial of a Number
+
+#!/bin/bash
+echo "Enter a number:"
+read num
+factorial=1
+for (( i=1; i<=num; i++ ))
+do
+    factorial=$((factorial * i))
+done
+echo "Factorial of $num is $factorial"
+
+
+3. Gross Salary Calculation
+
+#!/bin/bash
+echo "Enter Basic Salary:"
+read basic
+da=$(echo "$basic * 0.1" | bc) # DA as 10% of Basic
+hra=$(echo "$basic * 0.2" | bc) # HRA as 20% of Basic
+gross=$(echo "$basic + $da + $hra" | bc)
+echo "Gross Salary: $gross"
+
+
+4. Menu with Options
+
+
+#!/bin/bash
+while true
+do
+    echo "Select an option:"
+    echo "1) List of files"
+    echo "2) Process Status"
+    echo "3) Date"
+    echo "4) Users in the system"
+    echo "5) Quit"
+    read choice
+    case $choice in
+        1) ls ;;
+        2) ps ;;
+        3) date ;;
+        4) who ;;
+        5) break ;;
+        *) echo "Invalid option" ;;
+    esac
+done

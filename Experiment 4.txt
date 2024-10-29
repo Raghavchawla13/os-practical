@@ -1,0 +1,69 @@
+1. Check Even or Odd
+
+#!/bin/bash
+echo "Enter a number:"
+read num
+if [ $((num % 2)) -eq 0 ]
+then
+    echo "$num is even"
+else
+    echo "$num is odd"
+fi
+
+
+2. Check Prime
+
+#!/bin/bash
+echo "Enter a number:"
+read num
+if [ $num -lt 2 ]; then
+    echo "$num is not prime"
+    exit 1
+fi
+for (( i=2; i<=num/2; i++ ))
+do
+    if [ $((num % i)) -eq 0 ]
+    then
+        echo "$num is not prime"
+        exit 1
+    fi
+done
+echo "$num is prime"
+
+
+3. Check Palindrome
+
+#!/bin/bash
+echo "Enter a number:"
+read num
+temp=$num
+rev=0
+while [ $num -gt 0 ]
+do
+    rem=$((num % 10))
+    rev=$((rev * 10 + rem))
+    num=$((num / 10))
+done
+if [ $temp -eq $rev ]
+then
+    echo "$temp is a palindrome"
+else
+    echo "$temp is not a palindrome"
+fi
+
+
+14. Day of the Week
+
+#!/bin/bash
+echo "Enter a number (1-7):"
+read num
+case $num in
+    1) echo "Sunday" ;;
+    2) echo "Monday" ;;
+    3) echo "Tuesday" ;;
+    4) echo "Wednesday" ;;
+    5) echo "Thursday" ;;
+    6) echo "Friday" ;;
+    7) echo "Saturday" ;;
+    *) echo "Invalid input, please enter a number from 1 to 7" ;;
+esac
