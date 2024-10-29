@@ -1,0 +1,49 @@
+import java.util.Scanner;
+
+public class FCFSWithoutArrivalTime {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Taking input for number of processes
+        System.out.print("Enter number of processes: ");
+        int n = sc.nextInt();
+
+        int[] burstTime = new int[n];
+        int[] waitTime = new int[n];
+        int[] turnAroundTime = new int[n];
+
+        // Taking input for burst times
+        System.out.println("Enter burst times for each process:");
+        for (int i = 0; i < n; i++) {
+            System.out.print("Process " + (i + 1) + " Burst Time: ");
+            burstTime[i] = sc.nextInt();
+        }
+
+        // Calculate waiting times
+        waitTime[0] = 0;
+        for (int i = 1; i < n; i++) {
+            waitTime[i] = waitTime[i - 1] + burstTime[i - 1];
+        }
+
+        // Calculate turn around times
+        for (int i = 0; i < n; i++) {
+            turnAroundTime[i] = waitTime[i] + burstTime[i];
+        }
+
+        // Display process details and calculate average times
+        System.out.println("\nProcess\tBurst Time\tWaiting Time\tTurnaround Time");
+        int totalWaitTime = 0, totalTurnAroundTime = 0;
+        for (int i = 0; i < n; i++) {
+            totalWaitTime += waitTime[i];
+            totalTurnAroundTime += turnAroundTime[i];
+            System.out.println("P" + (i + 1) + "\t\t" + burstTime[i] + "\t\t" + waitTime[i] + "\t\t" + turnAroundTime[i]);
+        }
+
+        double avgWaitTime = (double) totalWaitTime / n;
+        double avgTurnAroundTime = (double) totalTurnAroundTime / n;
+        System.out.println("\nAverage Waiting Time: " + avgWaitTime);
+        System.out.println("Average Turnaround Time: " + avgTurnAroundTime);
+
+        sc.close();
+    }
+}
