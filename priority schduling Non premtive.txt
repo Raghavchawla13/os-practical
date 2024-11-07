@@ -1,0 +1,59 @@
+import java.util.Scanner;
+
+class Process {
+    int id;         // Process ID
+    int burstTime;  // Burst Time of the process
+    int priority;   // Priority of the process
+}
+
+public class PriorityScheduling {
+    
+    // Method to perform priority scheduling
+    public void scheduleProcesses(Process[] processes, int n) {
+        // Sort processes by priority (higher priority first)
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = i + 1; j < n; j++) {
+                if (processes[i].priority < processes[j].priority) {
+                    // Swap if priority of j is higher than i
+                    Process temp = processes[i];
+                    processes[i] = processes[j];
+                    processes[j] = temp;
+                }
+            }
+        }
+
+        // Display the scheduling order
+        System.out.println("Scheduling order based on priority:");
+        System.out.println("Process ID | Burst Time | Priority");
+        for (int i = 0; i < n; i++) {
+            System.out.println("    " + processes[i].id + "       |     " 
+                                + processes[i].burstTime + "     |    " 
+                                + processes[i].priority);
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        PriorityScheduling ps = new PriorityScheduling();
+
+        System.out.print("Enter the number of processes: ");
+        int n = scanner.nextInt();
+
+        Process[] processes = new Process[n];
+
+        // Taking input for each process
+        for (int i = 0; i < n; i++) {
+            processes[i] = new Process();
+            System.out.print("Enter burst time for Process " + (i + 1) + ": ");
+            processes[i].burstTime = scanner.nextInt();
+
+            System.out.print("Enter priority for Process " + (i + 1) + " (higher number = higher priority): ");
+            processes[i].priority = scanner.nextInt();
+
+            processes[i].id = i + 1;  // Setting Process ID
+        }
+
+        // Call the method to perform priority scheduling
+        ps.scheduleProcesses(processes, n);
+    }
+}
