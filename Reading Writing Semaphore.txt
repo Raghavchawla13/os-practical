@@ -1,0 +1,71 @@
+import java.util.concurrent.Semaphore;
+
+class Main {
+    // Semaphore for resource control
+    static Semaphore mutex = new Semaphore(1);      // Controls access to readerCount
+    static Semaphore writeLock = new Semaphore(1);  // Controls access to shared resource
+    static int readerCount = 0;                     // Number of active readers
+
+    // Reader class
+    static class Reader extends Thread {
+        @Override
+        public void run() {
+            try {
+                // Entry section for readers
+                mutex.acquire();    // Acquire mutex to update readerCount
+                readerCount++;
+                if (readerCount == 1) {
+                    writeLock.acquire(); // First reader locks the resource for writers
+                }
+                mutex.release();    // Release mutex after updating readerCount
+
+                // Critical section for readers
+                System.out.println("Reader " + Thread.currentThread().getId() + " is reading.");
+                Thread.sleep(500);  // Simulate reading time
+
+                // Exit section for readers
+                mutex.acquire();
+                readerCount--;
+                if (readerCount == 0) {
+                    writeLock.release(); // Last reader unlocks the resource for writers
+                }
+                mutex.release();
+            } catch (InterruptedException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    // Writer class
+    static class Writer extends Thread {
+        @Override
+        public void run() {
+            try {
+                // Entry section for writers
+                writeLock.acquire(); // Acquire writeLock to ensure no readers/writers are accessing
+
+                // Critical section for writers
+                System.out.println("Writer " + Thread.currentThread().getId() + " is writing.");
+                Thread.sleep(500);  // Simulate writing time
+
+                // Exit section for writers
+                writeLock.release(); // Release writeLock after writing
+            } catch (InterruptedException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        // Create and start readers and writers
+        Reader reader1 = new Reader();
+        Reader reader2 = new Reader();
+        Writer writer1 = new Writer();
+        Writer writer2 = new Writer();
+
+        reader1.start();
+        writer1.start();
+        reader2.start();
+        writer2.start();
+    }
+}

@@ -1,0 +1,76 @@
+import java.util.Scanner;
+
+public class RoundRobin {
+
+    // Function to find the waiting time for all processes
+    static void findWaitingTime(int processes[], int n, int burstTime[], int waitingTime[], int quantum) {
+        int remainingBurstTime[] = new int[n];
+        for (int i = 0; i < n; i++) {
+            remainingBurstTime[i] = burstTime[i];
+        }
+        int currentTime = 0;
+
+        while (true) {
+            boolean done = true;
+            for (int i = 0; i < n; i++) {
+                if (remainingBurstTime[i] > 0) {
+                    done = false; // There is a pending process
+                    if (remainingBurstTime[i] > quantum) {
+                        currentTime += quantum;
+                        remainingBurstTime[i] -= quantum;
+                    } else {
+                        currentTime += remainingBurstTime[i];
+                        waitingTime[i] = currentTime - burstTime[i];
+                        remainingBurstTime[i] = 0;
+                    }
+                }
+            }
+            if (done)
+                break;
+        }
+    }
+
+    // Function to calculate turnaround time
+    static void findTurnaroundTime(int processes[], int n, int burstTime[], int waitingTime[], int turnaroundTime[]) {
+        for (int i = 0; i < n; i++) {
+            turnaroundTime[i] = burstTime[i] + waitingTime[i];
+        }
+    }
+
+    // Function to calculate average time
+    static void findAverageTime(int processes[], int n, int burstTime[], int quantum) {
+        int waitingTime[] = new int[n];
+        int turnaroundTime[] = new int[n];
+        findWaitingTime(processes, n, burstTime, waitingTime, quantum);
+        findTurnaroundTime(processes, n, burstTime, waitingTime, turnaroundTime);
+
+        System.out.println("Process\tBurst Time\tWaiting Time\tTurnaround Time");
+        int totalWaitingTime = 0, totalTurnaroundTime = 0;
+        for (int i = 0; i < n; i++) {
+            totalWaitingTime += waitingTime[i];
+            totalTurnaroundTime += turnaroundTime[i];
+            System.out.println(" " + (i + 1) + "\t\t" + burstTime[i] + "\t\t" + waitingTime[i] + "\t\t" + turnaroundTime[i]);
+        }
+        System.out.println("Average Waiting Time = " + (float) totalWaitingTime / n);
+        System.out.println("Average Turnaround Time = " + (float) totalTurnaroundTime / n);
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter number of processes: ");
+        int n = sc.nextInt();
+        int processes[] = new int[n];
+        int burstTime[] = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            processes[i] = i + 1;
+            System.out.print("Enter burst time for process " + (i + 1) + ": ");
+            burstTime[i] = sc.nextInt();
+        }
+
+        System.out.print("Enter time quantum: ");
+        int quantum = sc.nextInt();
+        findAverageTime(processes, n, burstTime, quantum);
+        sc.close();
+    }
+}
