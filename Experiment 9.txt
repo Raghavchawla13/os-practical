@@ -1,0 +1,100 @@
+import java.util.concurrent.Semaphore;
+
+public class ReaderWriterProblem {
+    private static int readCount = 0;             // Number of readers currently reading
+    private static Semaphore mutex = new Semaphore(1);  // Mutex for readCount
+    private static Semaphore writeSem = new Semaphore(1); // Semaphore for writers
+    private static String sharedData = "Initial Data";  // Shared resource
+
+    // Reader
+    static class Reader extends Thread {
+        private int readerId;
+
+        public Reader(int id) {
+            this.readerId = id;
+        }
+
+        @Override
+        public void run() {
+            try {
+                // Entry Section
+                mutex.acquire();
+                readCount++;
+                if (readCount == 1) { // First reader locks the writeSem
+                    writeSem.acquire();
+                }
+                mutex.release();
+
+                // Critical Section
+                System.out.println("Reader " + readerId + " is reading: " + sharedData);
+                Thread.sleep((int) (Math.random() * 1000));
+
+                // Exit Section
+                mutex.acquire();
+                readCount--;
+                if (readCount == 0) { // Last reader releases the writeSem
+                    writeSem.release();
+                }
+                mutex.release();
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Writer
+    static class Writer extends Thread {
+        private int writerId;
+
+        public Writer(int id) {
+            this.writerId = id;
+        }
+
+        @Override
+        public void run() {
+            try {
+                // Entry Section
+                writeSem.acquire();
+
+                // Critical Section
+                sharedData = "Data written by Writer " + writerId;
+                System.out.println("Writer " + writerId + " is writing: " + sharedData);
+                Thread.sleep((int) (Math.random() * 1000));
+
+                // Exit Section
+                writeSem.release();
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // Main Method
+    public static void main(String[] args) {
+        int numReaders = 5;
+        int numWriters = 2;
+
+        Thread[] readers = new Thread[numReaders];
+        Thread[] writers = new Thread[numWriters];
+
+        // Create Reader Threads
+        for (int i = 0; i < numReaders; i++) {
+            readers[i] = new Reader(i + 1);
+        }
+
+        // Create Writer Threads
+        for (int i = 0; i < numWriters; i++) {
+            writers[i] = new Writer(i + 1);
+        }
+
+        // Start Reader and Writer Threads
+        for (Thread writer : writers) {
+            writer.start();
+        }
+        for (Thread reader : readers) {
+            reader.start();
+        }
+    }
+}

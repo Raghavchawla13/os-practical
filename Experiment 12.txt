@@ -1,0 +1,120 @@
+import java.util.*;
+
+public class PageReplacement {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Enter the number of frames:");
+        int frames = sc.nextInt();
+
+        System.out.println("Enter the number of pages:");
+        int pagesCount = sc.nextInt();
+
+        System.out.println("Enter the page reference string (space-separated):");
+        int[] pages = new int[pagesCount];
+        for (int i = 0; i < pagesCount; i++) {
+            pages[i] = sc.nextInt();
+        }
+
+        System.out.println("\nChoose the page replacement policy:");
+        System.out.println("1. FIFO");
+        System.out.println("2. LRU");
+        System.out.println("3. Optimal");
+        int choice = sc.nextInt();
+
+        switch (choice) {
+            case 1:
+                System.out.println("FIFO Page Replacement");
+                fifo(frames, pages);
+                break;
+            case 2:
+                System.out.println("LRU Page Replacement");
+                lru(frames, pages);
+                break;
+            case 3:
+                System.out.println("Optimal Page Replacement");
+                optimal(frames, pages);
+                break;
+            default:
+                System.out.println("Invalid choice!");
+        }
+        sc.close();
+    }
+
+    // FIFO Page Replacement
+    public static void fifo(int frames, int[] pages) {
+        Queue<Integer> memory = new LinkedList<>();
+        Set<Integer> inMemory = new HashSet<>();
+        int pageFaults = 0;
+
+        for (int page : pages) {
+            if (!inMemory.contains(page)) {
+                pageFaults++;
+                if (memory.size() == frames) {
+                    int removed = memory.poll();
+                    inMemory.remove(removed);
+                }
+                memory.add(page);
+                inMemory.add(page);
+            }
+            System.out.println("Frames: " + memory + " | Page Faults: " + pageFaults);
+        }
+        System.out.println("Total Page Faults: " + pageFaults);
+    }
+
+    // LRU Page Replacement
+    public static void lru(int frames, int[] pages) {
+        List<Integer> memory = new ArrayList<>();
+        int pageFaults = 0;
+
+        for (int page : pages) {
+            if (!memory.contains(page)) {
+                pageFaults++;
+                if (memory.size() == frames) {
+                    memory.remove(0);
+                }
+            } else {
+                memory.remove((Integer) page); // Remove the page to update its usage
+            }
+            memory.add(page);
+            System.out.println("Frames: " + memory + " | Page Faults: " + pageFaults);
+        }
+        System.out.println("Total Page Faults: " + pageFaults);
+    }
+
+    // Optimal Page Replacement
+    public static void optimal(int frames, int[] pages) {
+        List<Integer> memory = new ArrayList<>();
+        int pageFaults = 0;
+
+        for (int i = 0; i < pages.length; i++) {
+            int page = pages[i];
+
+            if (!memory.contains(page)) {
+                pageFaults++;
+                if (memory.size() == frames) {
+                    // Find the page to replace
+                    int farthest = -1, index = -1;
+                    for (int j = 0; j < memory.size(); j++) {
+                        int nextUse = Integer.MAX_VALUE;
+                        for (int k = i + 1; k < pages.length; k++) {
+                            if (memory.get(j) == pages[k]) {
+                                nextUse = k;
+                                break;
+                            }
+                        }
+                        if (nextUse > farthest) {
+                            farthest = nextUse;
+                            index = j;
+                        }
+                    }
+                    memory.set(index, page);
+                } else {
+                    memory.add(page);
+                }
+            }
+            System.out.println("Frames: " + memory + " | Page Faults: " + pageFaults);
+        }
+        System.out.println("Total Page Faults: " + pageFaults);
+    }
+}
