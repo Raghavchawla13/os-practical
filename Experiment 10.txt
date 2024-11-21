@@ -1,0 +1,72 @@
+import threading
+import time
+import random
+
+# Initialize semaphores
+mutex = threading.Semaphore(1)         # Controls access to `read_count`
+write_sem = threading.Semaphore(1)     # Ensures mutual exclusion for writers
+
+# Shared resources
+read_count = 0
+shared_data = 0
+
+def reader(reader_id):
+    global read_count
+    while True:
+        # Reader wants to read
+        mutex.acquire()
+        read_count += 1
+        if read_count == 1:  # First reader locks the write_sem
+            write_sem.acquire()
+        mutex.release()
+
+        # Reading
+        print(f"Reader {reader_id} is reading shared data: {shared_data}")
+        time.sleep(random.uniform(0.1, 0.5))  # Simulate reading time
+
+        # Reader finished reading
+        mutex.acquire()
+        read_count -= 1
+        if read_count == 0:  # Last reader releases the write_sem
+            write_sem.release()
+        mutex.release()
+
+        time.sleep(random.uniform(0.5, 1.5))  # Simulate time before next read
+
+def writer(writer_id):
+    global shared_data
+    while True:
+        # Writer wants to write
+        write_sem.acquire()
+
+        # Writing
+        shared_data = random.randint(1, 100)  # Simulate writing new data
+        print(f"Writer {writer_id} is writing shared data: {shared_data}")
+        time.sleep(random.uniform(0.2, 0.7))  # Simulate writing time
+
+        # Writer finished writing
+        write_sem.release()
+
+        time.sleep(random.uniform(1, 2))  # Simulate time before next write
+
+# Create reader and writer threads
+num_readers = 5
+num_writers = 2
+
+threads = []
+
+for i in range(num_readers):
+    t = threading.Thread(target=reader, args=(i,))
+    threads.append(t)
+
+for i in range(num_writers):
+    t = threading.Thread(target=writer, args=(i,))
+    threads.append(t)
+
+# Start threads
+for t in threads:
+    t.start()
+
+# Wait for threads to finish (in this case, they won't, as the program runs indefinitely)
+for t in threads:
+    t.join()

@@ -1,0 +1,105 @@
+import java.util.Scanner;
+
+public class BankersAlgorithm {
+    private int numProcesses;       // Number of processes
+    private int numResources;       // Number of resource types
+    private int[][] maximum;        // Maximum resource matrix
+    private int[][] allocation;     // Allocation matrix
+    private int[][] need;           // Need matrix
+    private int[] available;        // Available resources
+
+    public BankersAlgorithm(int numProcesses, int numResources) {
+        this.numProcesses = numProcesses;
+        this.numResources = numResources;
+        maximum = new int[numProcesses][numResources];
+        allocation = new int[numProcesses][numResources];
+        need = new int[numProcesses][numResources];
+        available = new int[numResources];
+    }
+
+    public void inputMatrices(Scanner sc) {
+        System.out.println("Enter the Maximum matrix:");
+        for (int i = 0; i < numProcesses; i++) {
+            for (int j = 0; j < numResources; j++) {
+                maximum[i][j] = sc.nextInt();
+            }
+        }
+
+        System.out.println("Enter the Allocation matrix:");
+        for (int i = 0; i < numProcesses; i++) {
+            for (int j = 0; j < numResources; j++) {
+                allocation[i][j] = sc.nextInt();
+            }
+        }
+
+        System.out.println("Enter the Available resources:");
+        for (int j = 0; j < numResources; j++) {
+            available[j] = sc.nextInt();
+        }
+
+        // Calculate Need matrix
+        for (int i = 0; i < numProcesses; i++) {
+            for (int j = 0; j < numResources; j++) {
+                need[i][j] = maximum[i][j] - allocation[i][j];
+            }
+        }
+    }
+
+    public boolean isSafe() {
+        boolean[] finish = new boolean[numProcesses];
+        int[] work = available.clone();
+        int[] safeSequence = new int[numProcesses];
+        int count = 0;
+
+        while (count < numProcesses) {
+            boolean found = false;
+            for (int i = 0; i < numProcesses; i++) {
+                if (!finish[i]) {
+                    boolean canProceed = true;
+                    for (int j = 0; j < numResources; j++) {
+                        if (need[i][j] > work[j]) {
+                            canProceed = false;
+                            break;
+                        }
+                    }
+                    if (canProceed) {
+                        for (int j = 0; j < numResources; j++) {
+                            work[j] += allocation[i][j];
+                        }
+                        safeSequence[count++] = i;
+                        finish[i] = true;
+                        found = true;
+                    }
+                }
+            }
+            if (!found) {
+                System.out.println("The system is in an unsafe state.");
+                return false;
+            }
+        }
+
+        System.out.println("The system is in a safe state.");
+        System.out.println("Safe sequence: ");
+        for (int i = 0; i < numProcesses; i++) {
+            System.out.print("P" + safeSequence[i]);
+            if (i != numProcesses - 1) System.out.print(" -> ");
+        }
+        System.out.println();
+        return true;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.println("Enter the number of processes:");
+        int numProcesses = sc.nextInt();
+        System.out.println("Enter the number of resource types:");
+        int numResources = sc.nextInt();
+
+        BankersAlgorithm ba = new BankersAlgorithm(numProcesses, numResources);
+        ba.inputMatrices(sc);
+        ba.isSafe();
+
+        sc.close();
+    }
+}
